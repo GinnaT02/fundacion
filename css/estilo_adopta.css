@@ -1,0 +1,97 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.fundacion{
+    text-align: center;
+    line-height: 1.3;
+    margin-top: 14px;
+    font-family: "Concert One", sans-serif;
+}
+.tit2{
+    font-family: "Bad Script", cursive;
+    font-size: 25px;
+}
+body {
+    background-color: #f3f3f3;
+}
+header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #535353;
+    background-color: #f5d2f2;
+}
+header h1 {
+    margin-bottom: 10px;
+    font-size: 40px;
+    font-style: normal;
+    color: #000000;
+}
+.section {
+    text-align: center;
+    margin: 20px 0;
+    font-style:italic;
+    color: #000000;
+    font-family: "Bad Script", cursive;
+    background-color: #f5d2f2;
+}
+.lista_perros {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.contenedor_perros {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 15px;
+    padding: 15px;
+    width: 50%;
+    text-align: center;
+    margin: 20px;
+}
+.contenedor_perros img {
+    max-width: 30%;
+    border-radius: 10px;
+    object-fit: cover;
+    height: 250px;
+}
+.contenedor_perros h3 {
+    font-style: normal;
+    color: #000000;
+    font-size: 30px;
+}
+footer {
+    background-color: #fff;
+    padding: 50px;
+    font-style: normal;
+    text-align: center;
+    margin-top: 40px;
+    border-top: 2px solid #535353;
+}
+.milo{
+    height: 300px;
+    width: 100%;
+}
+.paco{
+    height: 300px;
+    width: 100%;
+}
+.perro_gif{
+    width: 50%;
+    height: 300px;
+}
+.texto {
+    font-size: 20px;
+    font-style: italic;
+    padding: 15px; 
+    max-width: 800px;
+    line-height: 30px;
+    margin: 0 auto;
+    font-weight: bold;
+    text-align: center;
+}
+.titulo_lista{
+    font-style: normal;
+}
