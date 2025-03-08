@@ -136,7 +136,7 @@ mysqli_close($conexion);
         </div>
         <div id="formularioAdoptantes" class="dashboard">
             <center>
-                <h3>Formulario adoptantes</h3>
+                <h3>Formulario de adoptantes</h3>
                 <form>
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre"><br><br>
