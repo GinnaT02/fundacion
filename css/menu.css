@@ -110,3 +110,53 @@ select {
     cursor: pointer;
     font-size: 16px;
 }
+#formularioAdoptantes {
+    display: none;
+}
+
+#formularioAdoptantes.active {
+    display: block !important;
+}
+
+#formularioAdoptantes input,
+textarea,
+select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#formularioAdoptantes h3 {
+    margin-bottom: 25px;
+}
+
+#formularioAdoptantes {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    text-align: center;
+    margin-left: 370px;
+}
+
+#formularioAdoptantes button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+#formularioAdoptantes {
+    display: none;
+}
+
+#formularioAdoptantes.active {
+    display: block !important;
+}
