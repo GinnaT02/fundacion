@@ -123,14 +123,14 @@ mysqli_close($conexion);
 
         <!-- MODULO HISTORIA CLINICA -->
         <div id="historiaClinica" class="dashboard active">
-            Historia Clinica
+        <h1>Historia Clinica</h1>
         </div>
         <!-- ---------------------------------------------- -->
 
 
 <!-- MODULO ADOPTANTES -->
 <?php
-// Conectar a la base de datos correctamente
+// Conectar a la base de datos
 $servidor = "127.0.0.1";
 $usuario = "root";
 $contrasena = "";
@@ -142,36 +142,66 @@ if ($conexion->connect_error) {
     die("Error en la conexión: " . $conexion->connect_error);
 }
 
-// Insertar datos si el formulario es enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre = $conexion->real_escape_string($_POST['nombre']);
-    $direccion = $conexion->real_escape_string($_POST['direccion']);
-    $correo = $conexion->real_escape_string($_POST['correo']);
-    $telefono = $conexion->real_escape_string($_POST['telefono']);
-    $edad = (int) $_POST['edad'];
-    $fecha_adopcion = $conexion->real_escape_string($_POST['fecha_adopcion']);
-    $observaciones = $conexion->real_escape_string($_POST['observaciones_generales']);
-    $id_animal = (int) $_POST['id_animal'];
-    
-    $sql_insert = "INSERT INTO adopciones (nombre, direccion, correo, telefono, edad, fecha_adopcion, observaciones_generales, id_animal) 
-                   VALUES ('$nombre', '$direccion', '$correo', '$telefono', $edad, '$fecha_adopcion', '$observaciones', $id_animal)";
-    
-    if ($conexion->query($sql_insert) === TRUE) {
-        echo "<script>('Adoptante registrado exitosamente'); window.location.href='menu.php';</script>";
-    } else {
-        echo "Error al insertar: " . $conexion->error;
+// Verificar si el formulario fue enviado
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion'])) {
+    $accion = $_POST['accion'];
+
+    if ($accion == "eliminar") {
+        if (!empty($_POST['id_adopcion'])) {
+            $id_adopcion = (int) $_POST['id_adopcion'];
+            $sql_delete = "DELETE FROM adopciones WHERE id_adopcion = $id_adopcion";
+
+            if ($conexion->query($sql_delete) === TRUE) {
+                echo "Registro eliminado correctamente";
+            } else {
+                echo "Error al eliminar: " . $conexion->error;
+            }
+        } else {
+            echo "Error: Falta el ID de adopción.";
+        }
+        exit;
     }
+
+    // Validar campos solo para insertar o editar
+    if ($accion == "insertar" || $accion == "editar") {
+        if (empty($_POST['nombre']) || empty($_POST['direccion']) || empty($_POST['correo']) || 
+            empty($_POST['telefono']) || empty($_POST['edad']) || empty($_POST['fecha_adopcion']) || 
+            empty($_POST['id_animal'])) {
+            echo "Error: Todos los campos son obligatorios.";
+            exit;
+        }
+    }
+
+    if ($accion == "insertar") {
+        $nombre = $conexion->real_escape_string($_POST['nombre']);
+        $direccion = $conexion->real_escape_string($_POST['direccion']);
+        $correo = $conexion->real_escape_string($_POST['correo']);
+        $telefono = $conexion->real_escape_string($_POST['telefono']);
+        $edad = (int) $_POST['edad'];
+        $fecha_adopcion = $conexion->real_escape_string($_POST['fecha_adopcion']);
+        $observaciones = $conexion->real_escape_string($_POST['observaciones_generales']);
+        $id_animal = (int) $_POST['id_animal'];
+
+        $sql_insert = "INSERT INTO adopciones (nombre, direccion, correo, telefono, edad, fecha_adopcion, observaciones_generales, id_animal) 
+                       VALUES ('$nombre', '$direccion', '$correo', '$telefono', $edad, '$fecha_adopcion', '$observaciones', $id_animal)";
+
+        if ($conexion->query($sql_insert) === TRUE) {
+            echo "<script>('Adoptante registrado exitosamente'); window.location.href='menu.php';</script>";
+        } else {
+            echo "Error al insertar: " . $conexion->error;
+        }
+    }
+
 }
 ?>
 
 <div id="adoptantes" class="dashboard">
     <h1>Personas adoptantes</h1>
-    <button onclick="showForm()" class="boton">Ingresa adoptantes</button>
-    
+    <button onclick="showForm()" class="boton">Ingresar adoptantes</button>
+
     <div id="tablaAdopciones" style="margin-top: 20px;">
         <?php
-        // Consulta para obtener los datos
-        $sql = "SELECT a.nombre, a.direccion, a.correo, a.telefono, a.edad, a.fecha_adopcion, a.observaciones_generales, r.nombre AS animal_nombre 
+        $sql = "SELECT a.id_adopcion, a.nombre, a.direccion, a.correo, a.telefono, a.edad, a.fecha_adopcion, a.observaciones_generales, r.nombre AS animal_nombre 
                 FROM adopciones a 
                 JOIN rescatados r ON a.id_animal = r.id_animal";
         $resultado = $conexion->query($sql);
@@ -187,8 +217,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <th>Fecha de adopción</th>
                     <th>Observaciones</th>
                     <th>Animal Adoptado</th>
+                    <th>Acciones</th>
                   </tr>";
-            
+
             while ($fila = $resultado->fetch_assoc()) {
                 echo "<tr>
                         <td>{$fila['nombre']}</td>
@@ -200,9 +231,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <td>{$fila['observaciones_generales']}</td>
                         <td>{$fila['animal_nombre']}</td>
                         <td>
-                <button class='editar' onclick='editarFila(this)'>Editar</button>
-                <button class='eliminar' onclick='eliminarFila(this)'>Eliminar</button>
-            </td>
+                            <button class='editar' onclick='editarFila(this)'>Editar</button>
+                            <button class='eliminar' onclick='eliminarFila(this, {$fila['id_adopcion']})'>Eliminar</button>
+                        </td>
                       </tr>";
             }
             echo "</table>";
@@ -212,12 +243,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ?>
     </div>
 </div>
-
 <!-- FORMULARIO ADOPTANTES -->
 <div id="formularioAdoptantes" class="dashboard" style="display:none;">
     <center>
         <form method="POST" action="">
             <h3>Formulario de Adopción</h3>
+            <input type="hidden" name="accion" value="insertar">
             <input type="text" name="nombre" placeholder="Nombre del adoptante" required>
             <input type="text" name="direccion" placeholder="Dirección" required>
             <input type="email" name="correo" placeholder="Correo electrónico" required>
@@ -241,6 +272,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </center>
 </div>
+<script>
+function eliminarFila(boton, id) {
+    if (confirm("¿Estás seguro de eliminar esta adopción?")) {
+        fetch('', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ accion: "eliminar", id_adopcion: id })
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.includes("Registro eliminado correctamente")) {
+                boton.closest("tr").remove();
+            } else {
+                alert(data);
+            }
+        })
+        .catch(error => {
+            alert("Error: " + error);
+        });
+    }
+}
+</script>
+
 
         <!-- -------------------------------------------------------------------------------- -->
 
