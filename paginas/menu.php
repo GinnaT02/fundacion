@@ -123,7 +123,7 @@ mysqli_close($conexion);
 
         <!-- MODULO HISTORIA CLINICA -->
         <div id="historiaClinica" class="dashboard active">
-        <h1>Historia Clinica</h1>
+        <h1>Historia Clinica hola</h1>
         </div>
         <!-- ---------------------------------------------- -->
 
