@@ -1,46 +1,67 @@
+<?php
+    $mascotas = [
+        ["nombre" => "Paco", "edad" => 9, "descripcion" => "Perrito cariñoso y enérgico."],
+        ["nombre" => "Milo", "edad" => 5, "descripcion" => "Gatito curioso e independiente."]
+    ];
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adopta</title>
-    <link rel="stylesheet" type="text/css" href="../css/estilo_adopta.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Noto+Sans+Hebrew:wght@100..900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Concert+One&family=Noto+Sans+Hebrew:wght@100..900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Noto+Sans+Hebrew:wght@100..900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Concert+One&family=Noto+Sans+Hebrew:wght@100..900&display=swap" rel="stylesheet">
-
+    <title>Informes de Adopción</title>
+    <link rel="stylesheet" type="text/css" href="../css/estilo_informes.css">
 </head>
 <body>
-    <div class="fundacion">
-    <h1>FUNDACION RESCATA AMOR</h1>
-    <h1 class="tit2">El amor cambia vidas</h1>
-</div>
-   
+    <header>
+        <h1>Informes de Adopción</h1>
+    </header>
     <main>
-        <section class="section">
-        <h2 class="titulo_lista">Lista de peluditos en adopción</h2>
-        <p class="texto">Nuestros peludos están buscando un hogar permanente y lleno de amor. Una vez que hayas encontrado al compañero ideal para adoptar, revisa los requisitos y completa el formulario correspondiente. ¡Estamos ansiosos por ayudarte a encontrar a tu nuevo mejor amigo!</p>
-    </section>
         <section>
-            <div class="lista_perros">
-            <div class="contenedor_perros">
-                <img src="../img/perro3.jpg" alt="Paco" class="paco">
-                <h3>Paco - 9 años</h3>
-                <p>¡Hola! Me llamo Paco y soy un perrito lleno de energía y amor. Tengo un pelaje suavecito y unas orejas grandes que siempre están atentas para escuchar cada palabra que me digas. Lo que más me gusta en el mundo es correr al aire libre, jugar a la pelota y, sobre todo, ¡recibir muchos mimos! Soy muy cariñoso y prometo que si me adoptas, seré tu mejor amigo para siempre. A veces me pongo un poco nervioso con los ruidos fuertes, pero si me das una caricia, me tranquilizo de inmediato. Estoy buscando una familia que quiera compartir aventuras conmigo. ¿Te gustaría ser esa persona especial? ¡Adóptame y hagamos una vida llena de momentos felices juntos!</p>
-            </div>
-            <div class="contenedor_perros">
-                <img src="../img/perro4.jpg" alt="Milo" class="milo">
-                <h3>Milo - 5 años</h3>
-                <p>¡Hola, humano! Soy Milo, un gatito con mucha curiosidad y una personalidad única. Me encanta explorar cada rincón de la casa, y cuando termino mis aventuras diarias, busco un lugar cómodo para acurrucarme. Si me adoptas, te prometo muchas horas de ronroneos y compañía. Aunque soy un poquito independiente, siempre estaré cerca para hacerte compañía. Me gusta que me rasquen detrás de las orejas y, de vez en cuando, jugar con una pelota o una cuerda. Si necesitas un amigo que te haga sonreír cada día, aquí estoy yo, esperando encontrar mi hogar ideal. ¿Te animas a conocerme? ¡Yo también quiero una familia a quien amar!</p>
-            </div>
-            </div>
+            <h2>Filtrar Informes</h2>
+            <form method="GET">
+                <label for="edad">Filtrar por edad:</label>
+                <select name="edad" id="edad">
+                    <option value="todos">Todos</option>
+                    <option value="joven">Menos de 5 años</option>
+                    <option value="adulto">5 años o más</option>
+                </select>
+                <button type="submit">Generar Informe</button>
+            </form>
+        </section>
+        <section>
+            <h2>Lista de Mascotas</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Edad</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $filtro = $_GET['edad'] ?? 'todos';
+                        foreach ($mascotas as $mascota) {
+                            if (($filtro == 'joven' && $mascota['edad'] >= 5) || ($filtro == 'adulto' && $mascota['edad'] < 5)) {
+                                continue;
+                            }
+                            echo "<tr>";
+                            echo "<td>{$mascota['nombre']}</td>";
+                            echo "<td>{$mascota['edad']} años</td>";
+                            echo "<td>{$mascota['descripcion']}</td>";
+                            echo "</tr>";
+                        }
+                    ?>
+                </tbody>
+            </table>
         </section>
     </main>
     <footer>
-        <p>Fundación Rescata Amor © 2024</p>
+        <form method="POST" action="exportar_pdf.php">
+            <button type="submit">Exportar a PDF</button>
+        </form>
     </footer>
 </body>
 </html>
+
