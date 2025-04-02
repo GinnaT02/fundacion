@@ -88,6 +88,8 @@ mysqli_close($conexion);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/informes.css">
+
     <title>Menú</title>
     <script>
         function showSection(sectionId) {
@@ -95,6 +97,13 @@ mysqli_close($conexion);
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
+        }
+
+        function showInforme(sectionId) {
+            document.querySelectorAll('.informe').forEach(section => {
+                section.classList.remove('activeInforme');
+            });
+            document.getElementById(sectionId).classList.add('activeInforme');
         }
 
         function showForm() {
@@ -116,6 +125,7 @@ mysqli_close($conexion);
             <li onclick="showSection('historiaClinica')">Historia Clínica</li>
             <li onclick="showSection('adoptantes')">Adoptantes</li>
             <li onclick="showSection('rescatados')">Rescatados</li>
+            <li onclick="showSection('informes')">Informes</li>
         </ul>
     </div>
     <div class="content">
@@ -243,6 +253,220 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion'])) {
         ?>
     </div>
 </div>
+
+<!-- MODULO INFORMES -->
+
+<?php
+// Conectar a la base de datos
+$servidor = "127.0.0.1";
+$usuario = "root";
+$contrasena = "";
+$base_datos = "fundacion";
+$conexion = new mysqli($servidor, $usuario, $contrasena, $base_datos);
+
+// Verificar la conexión
+if ($conexion->connect_error) {
+    die("Error en la conexión: " . $conexion->connect_error);
+}
+?>
+
+<div id="informes" class="dashboard">
+    <h1>Informes</h1>
+    <div class="botones">
+    <button id="boton1" onclick="showInforme('modulo1')">Historia Clinica</button>
+    <button id="boton2" onclick="showInforme('modulo2')">Adoptantes</button>
+    <button id="boton3" onclick="showInforme('modulo3')">Rescatados</button>
+</div>
+    
+    <div id="modulo1" class="informe" >
+        <h2 class="titulosInformes">Historia Clinica</h2>
+        <table border='1' style='width:100%; text-align:center; border-collapse: collapse;'>
+            <tr>
+                <th>Columna 1</th>
+                <th>Columna 2</th>
+                <th>Columna 3</th>
+                <th>Columna 4</th>
+                <th>Columna 5</th>
+            </tr>
+            <?php
+            // Consulta SQL para la tabla 1
+            // $sql1 = "SELECT col1, col2, col3, col4, col5 FROM tabla1";
+            // $resultado1 = $conexion->query($sql1);
+            // if ($resultado1->num_rows > 0) {
+            //     while ($fila = $resultado1->fetch_assoc()) {
+            //         echo "<tr>
+            //                 <td>{$fila['col1']}</td>
+            //                 <td>{$fila['col2']}</td>
+            //                 <td>{$fila['col3']}</td>
+            //                 <td>{$fila['col4']}</td>
+            //                 <td>{$fila['col5']}</td>
+            //               </tr>";
+            //     }
+            // }
+            ?>
+        </table>
+    </div>
+
+    <div id="modulo2" class="informe" >
+        <h2 class="titulosInformes">Adoptantes</h2>
+        <table border='1' style='width:50%; text-align:center; border-collapse: collapse;'>
+            <tr>
+                <th class="camposInformes">    Tiempo     </th>
+                <th class="camposInformes">Cantidad de adoptados</th>
+            </tr>
+            <?php
+            
+            $consulta = "SELECT * FROM adopciones";
+            $registros = $conexion->query($consulta);
+            $adoptadosDia = 0;
+            $adoptadosSemana = 0;
+             $adoptadosMes = 0;
+             $adoptadosAnio = 0;
+             $adoptadosMasDeUno = 0;
+             
+             $hoy = new DateTime(); 
+             $adoptantes = []; 
+             
+             foreach ($registros as $adopcion) {
+                 $fechaAdopcion = new DateTime($adopcion['fecha_adopcion']); 
+                 $diferenciaDias = $hoy->diff($fechaAdopcion)->days; 
+                
+                 if ($fechaAdopcion = $hoy) {
+                     $adoptadosDia++;
+                    }
+                    
+                    if ($diferenciaDias <= 7) {
+                        $adoptadosSemana++;
+                    }
+                    
+                    if ($hoy->format('Y-m') == $fechaAdopcion->format('Y-m')) {
+                        $adoptadosMes++;
+                    }
+                    
+                    if ($hoy->format('Y') == $fechaAdopcion->format('Y')) {
+                        $adoptadosAnio++;
+                    }
+                    
+                    $nombre = $adopcion['nombre'];
+                    if (!isset($adoptantes[$nombre])) {
+                        $adoptantes[$nombre] = 1;
+                    } else {
+                        $adoptantes[$nombre]++;
+                        if ($adoptantes[$nombre] == 2) { 
+                            $adoptadosMasDeUno++;
+                        }
+                    }
+                }
+             
+             if ($registros->num_rows > 0) {
+                echo "<tr>
+                            <td class='camposInformes'>Adoptados ultimo dia</td>
+                            <td class='camposInformes'>$adoptadosDia</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Adoptados ultima semana</td>
+                            <td class='camposInformes'>$adoptadosSemana</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Adoptados ultimo mes</td>
+                            <td class='camposInformes'>$adoptadosMes</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Adoptados ultimo año</td>
+                            <td class='camposInformes'>$adoptadosAnio</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Adoptante > 1 rescatado</td>
+                            <td class='camposInformes'>$adoptadosMasDeUno</td>
+                      </tr>";
+             }
+            ?>
+        </table>
+    </div>
+
+    <div id="modulo3" class="informe" >
+        <h2 class="titulosInformes">Rescatados</h2>
+        <table border='1' style='width:100%; text-align:center; border-collapse: collapse;'>
+        <tr>
+                <th class="camposInformes">    Tiempo     </th>
+                <th class="camposInformes">Cantidad de rescatados</th>
+            </tr>
+            <?php
+            
+            $consulta = "SELECT * FROM rescatados";
+            $registros2 = $conexion->query($consulta);
+            $rescatadosDia = 0;
+            $rescatadosSemana = 0;
+            $rescatadosMes = 0;
+            $rescatadosAnio = 0;
+            $rescatadosCondiciones = 0;
+             
+             $hoy = new DateTime(); 
+             $rescatados = []; 
+             
+             foreach ($registros2 as $rescate) {
+                 $fecha = new DateTime($rescate['fecha']); 
+                 $diferenciaDias = $hoy->diff($fecha)->days; 
+                
+                 if ($fecha = $hoy) {
+                     $rescatadosDia++;
+                    }
+                    
+                    if ($diferenciaDias <= 7 && $fecha <= $hoy) {
+                        $rescatadosSemana++;
+                    }
+                    
+                    if ($hoy->format('Y-m') == $fecha->format('Y-m')) {
+                        $rescatadosMes++;
+                    }
+                    
+                    if ($hoy->format('Y') == $fecha->format('Y')) {
+                        $rescatadosAnio++;
+                    }
+                    
+                    $condiciones_e = $rescate['condiciones_e'];
+
+                    if (!isset($rescatados[$condiciones_e])) {
+                        $rescatados[$condiciones_e] = 1;
+                    } else {
+                        $rescatados[$condiciones_e]++;
+                    }
+                    
+                    // Si el rescate tiene "Si" en condiciones especiales, contar
+                    if ($condiciones_e == 'Si') { 
+                        $rescatadosCondiciones++;
+                    }
+                    
+
+                }
+             
+             if ($registros->num_rows > 0) {
+                echo "<tr>
+                            <td class='camposInformes'>Rescatados ultimo dia</td>
+                            <td class='camposInformes'>$rescatadosDia</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Rescatados ultima semana</td>
+                            <td class='camposInformes'>$rescatadosSemana</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Rescatados ultimo mes</td>
+                            <td class='camposInformes'>$rescatadosMes</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Rescatados ultimo año</td>
+                            <td class='camposInformes'>$rescatadosAnio</td>
+                      </tr>
+                      <tr>
+                            <td class='camposInformes'>Rescatados Condiciones</td>
+                            <td class='camposInformes'>$rescatadosCondiciones</td>
+                      </tr>";
+             }
+            ?>
+        </table>
+    </div>
+</div>
+
 <!-- FORMULARIO ADOPTANTES -->
 <div id="formularioAdoptantes" class="dashboard" style="display:none;">
     <center>
