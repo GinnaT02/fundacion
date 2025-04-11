@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 // Cerrar conexión
-mysqli_close($conexion);
+//mysqli_close($conexion);
 ?>
 
 
@@ -132,9 +132,121 @@ mysqli_close($conexion);
 
 
         <!-- MODULO HISTORIA CLINICA -->
-        <div id="historiaClinica" class="dashboard active">
-        <h1>Historia Clinica</h1>
-        </div>
+        <!-- MODULO HISTORIA CLINICA -->
+<div id="historiaClinica" class="dashboard">
+    <h1>Historia Clínica</h1>
+    <button onclick="showFormHistoria()" class="boton">Agregar historia clínica</button>
+
+    <!-- Tabla de historias clínicas -->
+    <div id="tablaHistoriaClinica" style="margin-top: 20px;">
+        <?php
+        $sql_historia = "SELECT hc.id_historia_clinica, hc.fecha_chequeo, hc.peso, hc.tratamiento, hc.observaciones, hc.cuidados, r.nombre AS animal_nombre 
+                         FROM historia_clinica hc
+                         JOIN rescatados r ON hc.id_animal = r.id_animal";
+
+        $resultado_historia = $conexion->query($sql_historia);
+
+        if ($resultado_historia && $resultado_historia->num_rows > 0) {
+            echo "<table border='1' style='width:100%; text-align:center; border-collapse: collapse;'>";
+            echo "<tr style='background-color:#f2f2f2;'>
+                    <th>Fecha Chequeo</th>
+                    <th>Peso</th>
+                    <th>Tratamiento</th>
+                    <th>Observaciones</th>
+                    <th>Cuidados</th>
+                    <th>Animal</th>
+                    <th>Acciones</th>
+                  </tr>";
+
+            while ($fila = $resultado_historia->fetch_assoc()) {
+                echo "<tr>
+                        <td>{$fila['fecha_chequeo']}</td>
+                        <td>{$fila['peso']}</td>
+                        <td>{$fila['tratamiento']}</td>
+                        <td>{$fila['observaciones']}</td>
+                        <td>{$fila['cuidados']}</td>
+                        <td>{$fila['animal_nombre']}</td>
+                        <td>
+                            <button class='editar' onclick='editarHistoria(this)'>Editar</button>
+                            <button class='eliminar' onclick='eliminarHistoria(this, {$fila['id_historia_clinica']})'>Eliminar</button>
+                        </td>
+                      </tr>";
+            }
+            echo "</table>";
+        } else {
+            echo "<p>No hay registros aún en historia clínica.</p>";
+        }
+        ?>
+    </div>
+
+    <!-- Formulario oculto para agregar nueva historia clínica -->
+    <div id="formularioHistoria" style="display: none; margin-top: 20px;">
+        <form method="POST" action="menu.php">
+            <input type="hidden" name="accion" value="insertar_historia">
+
+            <label>Fecha de Chequeo:</label><br>
+            <input type="date" name="fecha_chequeo" required><br><br>
+
+            <label>Peso:</label><br>
+            <input type="text" name="peso" required><br><br>
+
+            <label>Tratamiento:</label><br>
+            <textarea name="tratamiento" required></textarea><br><br>
+
+            <label>Observaciones:</label><br>
+            <textarea name="observaciones" required></textarea><br><br>
+
+            <label>Cuidados:</label><br>
+            <textarea name="cuidados" required></textarea><br><br>
+
+            <label>Animal:</label><br>
+            <select name="id_animal" required>
+                <option value="">Seleccione un animal</option>
+                <?php
+                $sql_animales = "SELECT id_animal, nombre FROM rescatados";
+                $resultado_animales = $conexion->query($sql_animales);
+                while ($animal = $resultado_animales->fetch_assoc()) {
+                    echo "<option value='{$animal['id_animal']}'>{$animal['nombre']}</option>";
+                }
+                ?>
+            </select><br><br>
+
+            <input type="submit" value="Guardar Historia Clínica">
+        </form>
+    </div>
+</div>
+
+<!-- Script para mostrar u ocultar el formulario -->
+<script>
+function showFormHistoria() {
+    const form = document.getElementById("formularioHistoria");
+    form.style.display = (form.style.display === "none") ? "block" : "none";
+}
+</script>
+
+<?php
+// Procesar formulario para insertar historia clínica
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['accion'] === 'insertar_historia') {
+    $fecha = $conexion->real_escape_string($_POST['fecha_chequeo']);
+    $peso = $conexion->real_escape_string($_POST['peso']);
+    $tratamiento = $conexion->real_escape_string($_POST['tratamiento']);
+    $observaciones = $conexion->real_escape_string($_POST['observaciones']);
+    $cuidados = $conexion->real_escape_string($_POST['cuidados']);
+    $id_animal = (int) $_POST['id_animal'];
+
+    $sql_insert = "INSERT INTO historia_clinica (fecha_chequeo, peso, tratamiento, observaciones, cuidados, id_animal)
+                   VALUES ('$fecha', '$peso', '$tratamiento', '$observaciones', '$cuidados', $id_animal)";
+
+    if ($conexion->query($sql_insert) === TRUE) {
+        echo "<script>('Historia clínica guardada correctamente.'); window.location.href='menu.php';</script>";
+    } else {
+        echo "Error al guardar la historia clínica: " . $conexion->error;
+    }
+}
+?>
+
+
+        
         <!-- ---------------------------------------------- -->
 
 
